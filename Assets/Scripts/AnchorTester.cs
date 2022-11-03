@@ -8,13 +8,21 @@ public class AnchorTester : MonoBehaviour
 {
     public MarkerLocation AnchorLocation;
     private AnchorManager am;
+    private AnchorBinder binder;
 
     void Start()
     {
         am = FindObjectOfType<AnchorManager>();
+        binder = FindObjectOfType<AnchorBinder>();
+        binder.AllAnchors.Add(this);
 
         if (GetComponent<OVRSpatialAnchor>())
             BindRelationObject();
+    }
+
+    private void OnDestroy()
+    {
+        binder.AllAnchors.Remove(this);
     }
 
     [ContextMenu("DeleteAllPlayerPrefs")]
@@ -34,7 +42,7 @@ public class AnchorTester : MonoBehaviour
     {
         OVRSpatialAnchor anchor = gameObject.AddComponent<OVRSpatialAnchor>();
         await Task.Delay(1000);
-        am.SaveAnchor(anchor);
+        am.SaveAnchor(anchor, AnchorLocation);
     }
 
     [ContextMenu("Bind")]
@@ -65,13 +73,13 @@ public class AnchorTester : MonoBehaviour
             case MarkerLocation.MiddleLeft:
                 return new Vector3(localScale.x * 0.5f, 0, 0);
             case MarkerLocation.UpLeft:
-                break;
+                return new Vector3(localScale.x * 0.5f, 0, -localScale.z * 0.5f);
             case MarkerLocation.DownRight:
-                break;
+                return new Vector3(-localScale.x * 0.5f, 0, localScale.z * 0.5f);
             case MarkerLocation.MiddleRight:
-                break;
+                return new Vector3(-localScale.x * 0.5f, 0, 0);
             case MarkerLocation.UpRight:
-                break;
+                return new Vector3(-localScale.x * 0.5f, 0, -localScale.z * 0.5f);
             default:
                 break;
         }

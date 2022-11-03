@@ -26,7 +26,7 @@ public class AnchorManager : MonoBehaviour
         LoadAnchorsByUuid();
     }
 
-    public void SaveAnchor(OVRSpatialAnchor _spatialAnchor)
+    public void SaveAnchor(OVRSpatialAnchor _spatialAnchor, MarkerLocation location)
     {
         _spatialAnchor.Save((anchor, success) =>
         {
@@ -34,7 +34,7 @@ public class AnchorManager : MonoBehaviour
 
             // Write uuid of saved anchor to file
             int playerNumUuids = anchorDatabase.AnchorData.Count;
-            AnchorData data = new AnchorData(anchor.Uuid.ToString(), null, MarkerLocation.DownLeft);
+            AnchorData data = new AnchorData(anchor.Uuid.ToString(), null, location);
             anchorDatabase.AnchorData.Add(data);
 
             WriteFile();
@@ -102,7 +102,11 @@ public class AnchorManager : MonoBehaviour
 
         Pose pose = unboundAnchor.Pose;
         OVRSpatialAnchor spatialAnchor = Instantiate(AnchorPrefab, pose.position, pose.rotation).AddComponent<OVRSpatialAnchor>();
+        // TODO just a test
         unboundAnchor.BindTo(spatialAnchor);
+        AnchorTester tester = spatialAnchor.GetComponent<AnchorTester>();
+        tester.AnchorLocation = GetAnchorFromDatabase(spatialAnchor).MarkerLocation;
+        Debug.LogError(tester.AnchorLocation);
     }
 
     public void EraseAnchor(OVRSpatialAnchor _spatialAnchor)
@@ -115,8 +119,8 @@ public class AnchorManager : MonoBehaviour
             {
                 Debug.Log("erased anchor " + _spatialAnchor.name);
                 Destroy(_spatialAnchor);
-                int index = anchorDatabase.AnchorData.FindIndex(id => id.SpaceUuid == _spatialAnchor.Uuid.ToString());
-                anchorDatabase.AnchorData.RemoveAt(index);
+                AnchorData data = GetAnchorFromDatabase(_spatialAnchor);
+                anchorDatabase.AnchorData.Remove(data);
 
                 WriteFile();
             }
@@ -143,6 +147,11 @@ public class AnchorManager : MonoBehaviour
 
         // Write JSON to file
         File.WriteAllText(anchorFile, jsonString);
+    }
+
+    private AnchorData GetAnchorFromDatabase(OVRSpatialAnchor _spatialAnchor)
+    {
+        return anchorDatabase.AnchorData.FirstOrDefault(id => id.SpaceUuid == _spatialAnchor.Uuid.ToString());
     }
 
 }
