@@ -27,7 +27,6 @@ public class AnchorTester : MonoBehaviour
     public void Erase()
     {
         am.EraseAnchor(GetComponent<OVRSpatialAnchor>());
-
     }
 
     [ContextMenu("Save")]

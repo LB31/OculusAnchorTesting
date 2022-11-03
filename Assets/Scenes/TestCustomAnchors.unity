@@ -1482,7 +1482,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1022052205}
   - component: {fileID: 1022052206}
-  - component: {fileID: 1022052207}
   m_Layer: 0
   m_Name: Manager
   m_TagString: Untagged
@@ -1520,27 +1519,11 @@ MonoBehaviour:
   AnchorPrefab: {fileID: 771766547171808687, guid: 592d8084a7a018045a7a99945465e852,
     type: 3}
   RelationObject: {fileID: 566736725}
-  AllAnchors: []
---- !u!114 &1022052207
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1022052202}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44dc7e2f184d7a44bb193177587cb3cd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AnchorData:
-    SpaceUuids:
-    - 452
-    - 5423
-    PrefabNames:
-    - gfb
-    - fgh
-    MarkerLocations: 0200000004000000
+  anchorData:
+    SpaceUuids: []
+    PrefabNames: []
+    MarkerLocations: 
+  anchorFile: 
 --- !u!1 &1067345693
 GameObject:
   m_ObjectHideFlags: 0

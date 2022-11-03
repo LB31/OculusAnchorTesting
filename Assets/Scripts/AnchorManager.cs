@@ -1,23 +1,29 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using System.Linq;
+using static CustomEnums;
 
 public class AnchorManager : MonoBehaviour
 {
     public GameObject AnchorPrefab;
     public Transform RelationObject;
 
-    public const string NumUuidsPlayerPref = "numUuids";
+    public AnchorDatabase anchorDatabase = new();
 
-    private AnchorData anchorData = new();
+    public string anchorFile;
 
 
-    private void Start()
+    private void Awake()
     {
+        anchorFile = Application.persistentDataPath + "/anchorData.json";
+
+        ReadFile();
+
         // Check if markers exist
         LoadAnchorsByUuid();
-        anchorData = AnchorDataManager.Instance.AnchorData;
     }
 
     public void SaveAnchor(OVRSpatialAnchor _spatialAnchor)
@@ -27,31 +33,24 @@ public class AnchorManager : MonoBehaviour
             if (!success) return;
 
             // Write uuid of saved anchor to file
-            if (!PlayerPrefs.HasKey(NumUuidsPlayerPref))
-            {
-                PlayerPrefs.SetInt(NumUuidsPlayerPref, 0);
-                Debug.Log(PlayerPrefs.GetInt(NumUuidsPlayerPref));
-            }
+            int playerNumUuids = anchorDatabase.AnchorData.Count;
+            AnchorData data = new AnchorData(anchor.Uuid.ToString(), null, MarkerLocation.DownLeft);
+            anchorDatabase.AnchorData.Add(data);
 
-            int playerNumUuids = PlayerPrefs.GetInt(NumUuidsPlayerPref);
-            Debug.Log(playerNumUuids);
-            Debug.Log(anchor.Uuid.ToString());
+            WriteFile();
 
-            PlayerPrefs.SetString("uuid" + playerNumUuids, anchor.Uuid.ToString());
-            PlayerPrefs.SetInt(NumUuidsPlayerPref, ++playerNumUuids);
             Debug.Log(playerNumUuids);
         });
     }
 
     public void LoadAnchorsByUuid()
     {
-        if (!PlayerPrefs.HasKey(NumUuidsPlayerPref))
-        {
-            PlayerPrefs.SetInt(NumUuidsPlayerPref, 0);
-        }
+        ReadFile();
+
+        if (anchorDatabase == null) return;
 
         // Get number of saved anchor uuids
-        int playerUuidCount = PlayerPrefs.GetInt(NumUuidsPlayerPref);
+        int playerUuidCount = anchorDatabase.AnchorData.Count;
         Debug.Log($"Attempting to load {playerUuidCount} saved anchors.");
         if (playerUuidCount == 0)
             return;
@@ -59,11 +58,7 @@ public class AnchorManager : MonoBehaviour
         Guid[] uuids = new Guid[playerUuidCount];
         for (int i = 0; i < playerUuidCount; ++i)
         {
-            string uuidKey = "uuid" + i;
-            string currentUuid = PlayerPrefs.GetString(uuidKey);
-            Debug.Log("QueryAnchorByUuid: " + currentUuid);
-
-            uuids[i] = new Guid(currentUuid);
+            uuids[i] = new Guid(anchorDatabase.AnchorData[i].SpaceUuid);
         }
 
         LoadAnchors(new OVRSpatialAnchor.LoadOptions
@@ -120,8 +115,34 @@ public class AnchorManager : MonoBehaviour
             {
                 Debug.Log("erased anchor " + _spatialAnchor.name);
                 Destroy(_spatialAnchor);
+                int index = anchorDatabase.AnchorData.FindIndex(id => id.SpaceUuid == _spatialAnchor.Uuid.ToString());
+                anchorDatabase.AnchorData.RemoveAt(index);
+
+                WriteFile();
             }
         });
+    }
+
+    public void ReadFile()
+    {
+        // Does the file exist?
+        if (File.Exists(anchorFile))
+        {
+            // Read the entire file and save its contents
+            string fileContents = File.ReadAllText(anchorFile);
+
+            // Work with JSON
+            anchorDatabase = JsonUtility.FromJson<AnchorDatabase>(fileContents);
+        }
+    }
+
+    public void WriteFile()
+    {
+        // Serialize the object into JSON and save string
+        string jsonString = JsonUtility.ToJson(anchorDatabase);
+
+        // Write JSON to file
+        File.WriteAllText(anchorFile, jsonString);
     }
 
 }
