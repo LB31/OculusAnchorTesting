@@ -1,20 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using static CustomEnums;
 
 public class AnchorTester : MonoBehaviour
 {
     public MarkerLocation AnchorLocation;
+    public TMP_Text InfoText;
+
     private AnchorManager am;
     private AnchorBinder binder;
+    private int currentAnchorIndex;
+
 
     void Start()
     {
         am = FindObjectOfType<AnchorManager>();
         binder = FindObjectOfType<AnchorBinder>();
         binder.AllAnchors.Add(this);
+
+        InfoText.text = AnchorLocation.ToString();
 
         if (GetComponent<OVRSpatialAnchor>())
             BindRelationObject();
@@ -87,4 +95,20 @@ public class AnchorTester : MonoBehaviour
         return result;
     }
 
+    public void ChangeAnchorLocation(bool next)
+    {
+        int length = Enum.GetNames(typeof(MarkerLocation)).Length;
+
+        currentAnchorIndex = next ? currentAnchorIndex + 1 : currentAnchorIndex - 1;
+
+        if (currentAnchorIndex >= length)
+            currentAnchorIndex = 0;
+        if (currentAnchorIndex < 0)
+            currentAnchorIndex = length - 1;
+
+        MarkerLocation current = (MarkerLocation)currentAnchorIndex;
+
+        AnchorLocation = current;
+        InfoText.text = current.ToString();
+    }
 }

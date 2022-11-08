@@ -6,7 +6,7 @@ using UnityEngine.UI;
 // adding a GrabObject script to the object offers more functionality
 public class ObjectManipulator : MonoBehaviour
 {
-    OVRInput.Controller controller = OVRInput.Controller.RTouch;
+    public OVRInput.Controller controller = OVRInput.Controller.RTouch;
     GameObject hoverObject = null;
     GameObject grabObject = null;
     // all-purpose timer to use for blending after object is grabbed/released
