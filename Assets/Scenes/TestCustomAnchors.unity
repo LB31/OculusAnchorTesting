@@ -707,6 +707,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: DemoAnchorPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 8159548848137645212, guid: 592d8084a7a018045a7a99945465e852,
+        type: 3}
+      propertyPath: IsPlacementAnchor
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8564760365981273816, guid: 592d8084a7a018045a7a99945465e852,
         type: 3}
       propertyPath: m_RootOrder
@@ -1172,7 +1177,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1233,6 +1238,10 @@ PrefabInstance:
     - target: {fileID: 2037080, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_BackGroundColor.r
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
+      propertyPath: _trackingOriginType
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: isInsightPassthroughEnabled
@@ -1655,7 +1664,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1022052206
 MonoBehaviour:

@@ -9,23 +9,39 @@ using static CustomEnums;
 public class AnchorTester : MonoBehaviour
 {
     public MarkerLocation AnchorLocation;
-    public TMP_Text InfoText;
+    public TMP_Text TextAnchorLocation;
+    public TMP_Text TextTransform;
+    public TMP_Text TextTutorial; // Needed?
+    public bool IsPlacementAnchor;
 
     private AnchorManager anchorManager;
     private AnchorBinder binder;
     private int currentAnchorIndex;
+    private Vector3 lastPos;
 
 
     void Start()
     {
         anchorManager = FindObjectOfType<AnchorManager>();
         binder = FindObjectOfType<AnchorBinder>();
-        binder.AllAnchors.Add(this);
+        if (!IsPlacementAnchor)
+            binder.AllAnchors.Add(this);
 
-        InfoText.text = AnchorLocation.ToString();
+        TextAnchorLocation.text = AnchorLocation.ToString();
+
+        TextTransform.text = transform.position.ToString();
 
         if (GetComponent<OVRSpatialAnchor>())
             BindRelationObject();
+    }
+
+    private void Update()
+    {
+        if (transform.position != lastPos)
+        {
+            TextTransform.text = transform.position.ToString();
+            lastPos = transform.position;
+        }
     }
 
     private void OnDestroy()
@@ -50,6 +66,7 @@ public class AnchorTester : MonoBehaviour
     {
         GameObject copy = Instantiate(gameObject);
         Destroy(copy.GetComponent<Collider>());
+        copy.GetComponent<AnchorTester>().IsPlacementAnchor = false;
         OVRSpatialAnchor anchor = copy.AddComponent<OVRSpatialAnchor>();
         await Task.Delay(1000);
         anchorManager.SaveAnchor(anchor, AnchorLocation);
@@ -111,6 +128,6 @@ public class AnchorTester : MonoBehaviour
         MarkerLocation current = (MarkerLocation)currentAnchorIndex;
 
         AnchorLocation = current;
-        InfoText.text = current.ToString();
+        TextAnchorLocation.text = current.ToString();
     }
 }

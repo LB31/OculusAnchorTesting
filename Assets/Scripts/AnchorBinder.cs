@@ -13,29 +13,36 @@ public class AnchorBinder : MonoBehaviour
     private void Update()
     {
         t += Time.deltaTime;
-        if(t >= TimeTillNextCheck)
+        if (t >= TimeTillNextCheck)
         {
             t = 0;
             // Find nearest anchor
-            float nearest = float.MaxValue;
-            AnchorTester nearestAnchor = null;
-            foreach (AnchorTester anchor in AllAnchors)
-            {
-                float distnace = Vector3.Distance(Player.position, anchor.transform.position);
-                if(distnace < nearest)
-                {
-                    nearest = distnace;
-                    nearestAnchor = anchor;
-                }
-            }
+            AnchorTester nearestAnchor = FindNearestAnchor();
 
             // Bind play area
-            if(nearestAnchor != null)
+            if (nearestAnchor != null)
             {
                 nearestAnchor.BindRelationObject();
-                Debug.Log(nearestAnchor.name, nearestAnchor.gameObject);
+                Debug.Log(nearestAnchor.AnchorLocation, nearestAnchor.gameObject);
             }
 
         }
+    }
+
+    private AnchorTester FindNearestAnchor()
+    {
+        float nearest = float.MaxValue;
+        AnchorTester nearestAnchor = null;
+        foreach (AnchorTester anchor in AllAnchors)
+        {
+            float distnace = Vector3.Distance(Player.position, anchor.transform.position);
+            if (distnace < nearest)
+            {
+                nearest = distnace;
+                nearestAnchor = anchor;
+            }
+        }
+
+        return nearestAnchor;
     }
 }

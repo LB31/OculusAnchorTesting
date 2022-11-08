@@ -106,7 +106,7 @@ public class AnchorManager : MonoBehaviour
         unboundAnchor.BindTo(spatialAnchor);
         AnchorTester tester = spatialAnchor.GetComponent<AnchorTester>();
         tester.AnchorLocation = GetAnchorFromDatabase(spatialAnchor).MarkerLocation;
-        Debug.LogError(tester.AnchorLocation);
+        Debug.LogError(tester.AnchorLocation + " was localized");
     }
 
     public void EraseAnchor(OVRSpatialAnchor _spatialAnchor)

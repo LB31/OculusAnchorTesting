@@ -70,20 +70,25 @@ public class VR_ObjectMover : MonoBehaviour
             }
 
             // Change anchor type
-            if (OVRInput.GetDown(OVRInput.Button.One, controller))
-            {             
+            if (OVRInput.GetDown(OVRInput.RawButton.A))
+            {
                 anchor.ChangeAnchorLocation(true);
             }
-            if (OVRInput.GetDown(OVRInput.Button.Two, controller))
-            {           
+            if (OVRInput.GetDown(OVRInput.RawButton.B))
+            {
                 anchor.ChangeAnchorLocation(false);
             }
             // Place object
-            if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger))
-            {           
+            if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger) || OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger))
+            {
                 anchor.Save();
-                Debug.LogError("Save");
             }
+            // Erase Object
+            if (OVRInput.GetDown(OVRInput.RawButton.X))
+            {
+                anchor.Erase();
+            }
+            // TODO automatically place anchors according to placed one
         }
         else
         {
