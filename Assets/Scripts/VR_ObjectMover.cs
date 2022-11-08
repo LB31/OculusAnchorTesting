@@ -62,6 +62,8 @@ public class VR_ObjectMover : MonoBehaviour
             grabTime = Mathf.Clamp01(grabTime);
             ManipulateObject(grabObject, controllerPos, controllerRot);
 
+            AnchorTester anchor = grabObject.GetComponent<AnchorTester>();
+
             if (!OVRInput.Get(OVRInput.Button.PrimaryHandTrigger, controller))
             {
                 ReleaseObject();
@@ -69,16 +71,19 @@ public class VR_ObjectMover : MonoBehaviour
 
             // Change anchor type
             if (OVRInput.GetDown(OVRInput.Button.One, controller))
-            {
-                AnchorTester anchor = grabObject.GetComponent<AnchorTester>();
+            {             
                 anchor.ChangeAnchorLocation(true);
             }
             if (OVRInput.GetDown(OVRInput.Button.Two, controller))
-            {
-                AnchorTester anchor = grabObject.GetComponent<AnchorTester>();
+            {           
                 anchor.ChangeAnchorLocation(false);
             }
-
+            // Place object
+            if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger))
+            {           
+                anchor.Save();
+                Debug.LogError("Save");
+            }
         }
         else
         {

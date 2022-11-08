@@ -11,14 +11,14 @@ public class AnchorTester : MonoBehaviour
     public MarkerLocation AnchorLocation;
     public TMP_Text InfoText;
 
-    private AnchorManager am;
+    private AnchorManager anchorManager;
     private AnchorBinder binder;
     private int currentAnchorIndex;
 
 
     void Start()
     {
-        am = FindObjectOfType<AnchorManager>();
+        anchorManager = FindObjectOfType<AnchorManager>();
         binder = FindObjectOfType<AnchorBinder>();
         binder.AllAnchors.Add(this);
 
@@ -42,21 +42,23 @@ public class AnchorTester : MonoBehaviour
     [ContextMenu("Erase")]
     public void Erase()
     {
-        am.EraseAnchor(GetComponent<OVRSpatialAnchor>());
+        anchorManager.EraseAnchor(GetComponent<OVRSpatialAnchor>());
     }
 
     [ContextMenu("Save")]
     public async void Save()
     {
-        OVRSpatialAnchor anchor = gameObject.AddComponent<OVRSpatialAnchor>();
+        GameObject copy = Instantiate(gameObject);
+        Destroy(copy.GetComponent<Collider>());
+        OVRSpatialAnchor anchor = copy.AddComponent<OVRSpatialAnchor>();
         await Task.Delay(1000);
-        am.SaveAnchor(anchor, AnchorLocation);
+        anchorManager.SaveAnchor(anchor, AnchorLocation);
     }
 
     [ContextMenu("Bind")]
     public void BindRelationObject()
     {
-        Transform obj = am.RelationObject;
+        Transform obj = anchorManager.RelationObject;
         obj.gameObject.SetActive(true);
 
         obj.parent = transform;

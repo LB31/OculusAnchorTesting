@@ -118,7 +118,7 @@ public class AnchorManager : MonoBehaviour
             if (success)
             {
                 Debug.Log("erased anchor " + _spatialAnchor.name);
-                Destroy(_spatialAnchor);
+                Destroy(_spatialAnchor.gameObject);
                 AnchorData data = GetAnchorFromDatabase(_spatialAnchor);
                 anchorDatabase.AnchorData.Remove(data);
 

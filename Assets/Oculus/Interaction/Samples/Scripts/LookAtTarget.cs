@@ -33,8 +33,11 @@ namespace Oculus.Interaction.Samples
 
         protected virtual void Start()
         {
-            Assert.IsNotNull(_toRotate);
-            Assert.IsNotNull(_target);
+            //Assert.IsNotNull(_toRotate);
+            //Assert.IsNotNull(_target);
+
+            if (_target == null)
+                _target = Camera.main.transform;
         }
 
         protected virtual void Update()
