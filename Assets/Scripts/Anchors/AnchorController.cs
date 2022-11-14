@@ -63,25 +63,41 @@ namespace SpatialAnchor
         [ContextMenu("Save")]
         public async void Save()
         {
-            foreach (MarkerLocation marker in Enum.GetValues(typeof(MarkerLocation)))
-            {
-                GameObject copy = Instantiate(gameObject);
-                //Destroy(copy.GetComponent<Collider>());
+            Transform startParent = null;
 
-                // Set position
-                if(marker != 0)
-                {
-                    
-                }
+            foreach (MarkerLocation location in Enum.GetValues(typeof(MarkerLocation)))
+            {
+
+                Transform copy = Instantiate(gameObject).transform;
+                //Destroy(copy.GetComponent<Collider>());
 
                 AnchorController anchorCon = copy.GetComponent<AnchorController>();
                 anchorCon.IsPlacementAnchor = false;
-                anchorCon.AnchorLocation = marker;
+                anchorCon.AnchorLocation = location;
 
-                OVRSpatialAnchor anchor = copy.AddComponent<OVRSpatialAnchor>();
+                copy.name += location.ToString();
+
+                // Set position
+                if (location != 0)
+                {
+                    copy.parent = startParent;
+                    copy.localPosition = Vector3.zero;
+
+                    Vector3 nextPos = binder.GetNextAnchorPosition(location, anchorCon.ContentRoom);
+                    copy.localPosition += nextPos;
+
+                    copy.localRotation = Quaternion.identity;
+                    //copy.parent = null;
+                }
+                else
+                {
+                    startParent = copy;
+                }
+
+                //OVRSpatialAnchor anchor = copy.AddComponent<OVRSpatialAnchor>();
 
                 await Task.Delay(1000);
-                anchorManager.SaveAnchor(anchor, AnchorLocation, ContentRoom);
+                //anchorManager.SaveAnchor(anchor, AnchorLocation, ContentRoom);
             }
         }
 

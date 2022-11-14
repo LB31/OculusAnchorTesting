@@ -73,13 +73,16 @@ namespace SpatialAnchor
             roomObj.parent = null;
         }
 
-        private Vector3 GetMarkerPosition(Transform relationObj, MarkerLocation location)
+        public Vector3 GetMarkerPosition(Transform relationObj, MarkerLocation location)
         {
             Vector3 result = Vector3.zero;
             Vector3 localScale = relationObj.localScale;
 
             switch (location)
             {
+                case MarkerLocation.Middle:
+                    result = new Vector3(localScale.x * 0.5f, 0, localScale.z * 0.5f);
+                    break;
                 case MarkerLocation.DownLeft:
                     result = new Vector3(localScale.x * 0.5f, 0, localScale.z * 0.5f);
                     break;
@@ -110,25 +113,10 @@ namespace SpatialAnchor
             return RoomObjects.FirstOrDefault(obj => obj.RoomType.Equals(type)).Prefab;
         }
 
-        public Vector3 GetNextAnchorPosition(MarkerLocation location)
+        public Vector3 GetNextAnchorPosition(MarkerLocation location, ContentRoom roomType)
         {
-            switch (location)
-            {
-                case MarkerLocation.DownLeft:
-                    break;
-                case MarkerLocation.MiddleLeft:
-                    break;
-                case MarkerLocation.UpLeft:
-                    break;
-                case MarkerLocation.DownRight:
-                    break;
-                case MarkerLocation.MiddleRight:
-                    break;
-                case MarkerLocation.UpRight:
-                    break;
-                default:
-                    break;
-            }
+            GameObject room = GetRoomObject(roomType);
+            return GetMarkerPosition(room.transform, location);
         }
     }
 
