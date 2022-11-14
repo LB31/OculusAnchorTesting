@@ -9,7 +9,6 @@ using static CustomEnums;
 public class AnchorManager : MonoBehaviour
 {
     public GameObject AnchorPrefab;
-    public Transform RelationObject;
 
     public AnchorDatabase anchorDatabase = new();
 
@@ -26,7 +25,7 @@ public class AnchorManager : MonoBehaviour
         LoadAnchorsByUuid();
     }
 
-    public void SaveAnchor(OVRSpatialAnchor _spatialAnchor, MarkerLocation location)
+    public void SaveAnchor(OVRSpatialAnchor _spatialAnchor, MarkerLocation location, ContentRoom room)
     {
         _spatialAnchor.Save((anchor, success) =>
         {
@@ -34,12 +33,10 @@ public class AnchorManager : MonoBehaviour
 
             // Write uuid of saved anchor to file
             int playerNumUuids = anchorDatabase.AnchorData.Count;
-            AnchorData data = new AnchorData(anchor.Uuid.ToString(), null, location);
+            AnchorData data = new AnchorData(anchor.Uuid.ToString(), null, location, room);
             anchorDatabase.AnchorData.Add(data);
 
             WriteFile();
-
-            Debug.Log(playerNumUuids);
         });
     }
 
@@ -102,11 +99,17 @@ public class AnchorManager : MonoBehaviour
 
         Pose pose = unboundAnchor.Pose;
         OVRSpatialAnchor spatialAnchor = Instantiate(AnchorPrefab, pose.position, pose.rotation).AddComponent<OVRSpatialAnchor>();
-        // TODO just a test
         unboundAnchor.BindTo(spatialAnchor);
-        AnchorTester tester = spatialAnchor.GetComponent<AnchorTester>();
-        tester.AnchorLocation = GetAnchorFromDatabase(spatialAnchor).MarkerLocation;
-        Debug.LogError(tester.AnchorLocation + " was localized");
+
+        RestoreAnchor(spatialAnchor);
+    }
+
+    private void RestoreAnchor(OVRSpatialAnchor anchor)
+    {
+        AnchorTester tester = anchor.GetComponent<AnchorTester>();
+        AnchorData anchorData = GetAnchorFromDatabase(anchor);
+        tester.AnchorLocation = anchorData.MarkerLocation;
+        tester.ContentRoom = anchorData.ContentRoom;
     }
 
     public void EraseAnchor(OVRSpatialAnchor _spatialAnchor)
@@ -118,9 +121,9 @@ public class AnchorManager : MonoBehaviour
             if (success)
             {
                 Debug.Log("erased anchor " + _spatialAnchor.name);
-                Destroy(_spatialAnchor.gameObject);
                 AnchorData data = GetAnchorFromDatabase(_spatialAnchor);
                 anchorDatabase.AnchorData.Remove(data);
+                Destroy(_spatialAnchor.gameObject);
 
                 WriteFile();
             }

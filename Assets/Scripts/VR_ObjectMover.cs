@@ -78,6 +78,11 @@ public class VR_ObjectMover : MonoBehaviour
             {
                 anchor.ChangeAnchorLocation(false);
             }
+            // Change room type
+            if (OVRInput.GetDown(OVRInput.RawButton.Y))
+            {
+                anchor.ChangeAnchorRoom();
+            }
             // Place object
             if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger) || OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger))
             {

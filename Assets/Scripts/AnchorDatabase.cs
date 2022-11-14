@@ -19,11 +19,14 @@ public class AnchorData
     public string PrefabName;
     // Location of marker in the room
     public MarkerLocation MarkerLocation;
+    // Room that is connected with the anchor
+    public ContentRoom ContentRoom;
 
-    public AnchorData(string spaceUuid, string prefabName, MarkerLocation markerLocation)
+    public AnchorData(string spaceUuid, string prefabName, MarkerLocation markerLocation, ContentRoom contentRoom)
     {
         SpaceUuid = spaceUuid;
         PrefabName = prefabName;
         MarkerLocation = markerLocation;
+        ContentRoom = contentRoom;
     }
 }

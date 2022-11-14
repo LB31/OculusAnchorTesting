@@ -9,14 +9,16 @@ using static CustomEnums;
 public class AnchorTester : MonoBehaviour
 {
     public MarkerLocation AnchorLocation;
+    public ContentRoom ContentRoom;
     public TMP_Text TextAnchorLocation;
+    public TMP_Text TextContentRoom;
     public TMP_Text TextTransform;
-    public TMP_Text TextTutorial; // Needed?
     public bool IsPlacementAnchor;
 
     private AnchorManager anchorManager;
     private AnchorBinder binder;
-    private int currentAnchorIndex;
+    private int currentAnchorLocationIndex;
+    private int currentAnchorRoomIndex;
     private Vector3 lastPos;
 
 
@@ -28,11 +30,12 @@ public class AnchorTester : MonoBehaviour
             binder.AllAnchors.Add(this);
 
         TextAnchorLocation.text = AnchorLocation.ToString();
+        TextContentRoom.text = ContentRoom.ToString();
 
         TextTransform.text = transform.position.ToString();
 
-        if (GetComponent<OVRSpatialAnchor>())
-            BindRelationObject();
+        //if (GetComponent<OVRSpatialAnchor>())
+        //    BindRelationObject();
     }
 
     private void Update()
@@ -49,12 +52,6 @@ public class AnchorTester : MonoBehaviour
         binder.AllAnchors.Remove(this);
     }
 
-    [ContextMenu("DeleteAllPlayerPrefs")]
-    public void DeleteAllPlayerPrefs()
-    {
-        PlayerPrefs.DeleteAll();
-    }
-
     [ContextMenu("Erase")]
     public void Erase()
     {
@@ -69,65 +66,42 @@ public class AnchorTester : MonoBehaviour
         copy.GetComponent<AnchorTester>().IsPlacementAnchor = false;
         OVRSpatialAnchor anchor = copy.AddComponent<OVRSpatialAnchor>();
         await Task.Delay(1000);
-        anchorManager.SaveAnchor(anchor, AnchorLocation);
+        anchorManager.SaveAnchor(anchor, AnchorLocation, ContentRoom);
     }
 
-    [ContextMenu("Bind")]
-    public void BindRelationObject()
-    {
-        Transform obj = anchorManager.RelationObject;
-        obj.gameObject.SetActive(true);
 
-        obj.parent = transform;
-        obj.localPosition = Vector3.zero;
-
-        obj.localPosition += GetMarkerPosition(obj);
-
-        obj.localRotation = Quaternion.identity;
-
-        obj.parent = null;
-    }
-
-    private Vector3 GetMarkerPosition(Transform relationObj)
-    {
-        Vector3 result = Vector3.zero;
-        Vector3 localScale = relationObj.localScale;
-
-        switch (AnchorLocation)
-        {
-            case MarkerLocation.DownLeft:
-                return new Vector3(localScale.x * 0.5f, 0, localScale.z * 0.5f);
-            case MarkerLocation.MiddleLeft:
-                return new Vector3(localScale.x * 0.5f, 0, 0);
-            case MarkerLocation.UpLeft:
-                return new Vector3(localScale.x * 0.5f, 0, -localScale.z * 0.5f);
-            case MarkerLocation.DownRight:
-                return new Vector3(-localScale.x * 0.5f, 0, localScale.z * 0.5f);
-            case MarkerLocation.MiddleRight:
-                return new Vector3(-localScale.x * 0.5f, 0, 0);
-            case MarkerLocation.UpRight:
-                return new Vector3(-localScale.x * 0.5f, 0, -localScale.z * 0.5f);
-            default:
-                break;
-        }
-
-        return result;
-    }
 
     public void ChangeAnchorLocation(bool next)
     {
         int length = Enum.GetNames(typeof(MarkerLocation)).Length;
 
-        currentAnchorIndex = next ? currentAnchorIndex + 1 : currentAnchorIndex - 1;
+        currentAnchorLocationIndex = next ? currentAnchorLocationIndex + 1 : currentAnchorLocationIndex - 1;
 
-        if (currentAnchorIndex >= length)
-            currentAnchorIndex = 0;
-        if (currentAnchorIndex < 0)
-            currentAnchorIndex = length - 1;
+        if (currentAnchorLocationIndex >= length)
+            currentAnchorLocationIndex = 0;
+        if (currentAnchorLocationIndex < 0)
+            currentAnchorLocationIndex = length - 1;
 
-        MarkerLocation current = (MarkerLocation)currentAnchorIndex;
+        MarkerLocation current = (MarkerLocation)currentAnchorLocationIndex;
 
         AnchorLocation = current;
         TextAnchorLocation.text = current.ToString();
+    }
+
+    public void ChangeAnchorRoom()
+    {
+        int length = Enum.GetNames(typeof(ContentRoom)).Length;
+
+        currentAnchorRoomIndex++;
+
+        if (currentAnchorRoomIndex >= length)
+            currentAnchorRoomIndex = 0;
+        if (currentAnchorRoomIndex < 0)
+            currentAnchorRoomIndex = length - 1;
+
+        ContentRoom current = (ContentRoom)currentAnchorRoomIndex;
+
+        ContentRoom = current;
+        TextContentRoom.text = current.ToString();
     }
 }

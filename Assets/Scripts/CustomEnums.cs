@@ -9,4 +9,11 @@ public class CustomEnums
         MiddleRight,
         UpRight
     }
+
+    public enum ContentRoom
+    {
+        LivingRoom,
+        Kitchen,
+        Bathroom
+    }
 }
