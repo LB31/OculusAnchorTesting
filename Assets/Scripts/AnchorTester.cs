@@ -6,102 +6,105 @@ using TMPro;
 using UnityEngine;
 using static CustomEnums;
 
-public class AnchorTester : MonoBehaviour
+namespace SpatialAnchor
 {
-    public MarkerLocation AnchorLocation;
-    public ContentRoom ContentRoom;
-    public TMP_Text TextAnchorLocation;
-    public TMP_Text TextContentRoom;
-    public TMP_Text TextTransform;
-    public bool IsPlacementAnchor;
-
-    private AnchorManager anchorManager;
-    private AnchorBinder binder;
-    private int currentAnchorLocationIndex;
-    private int currentAnchorRoomIndex;
-    private Vector3 lastPos;
-
-
-    void Start()
+    public class AnchorTester : MonoBehaviour
     {
-        anchorManager = FindObjectOfType<AnchorManager>();
-        binder = FindObjectOfType<AnchorBinder>();
-        if (!IsPlacementAnchor)
-            binder.AllAnchors.Add(this);
+        public MarkerLocation AnchorLocation;
+        public ContentRoom ContentRoom;
+        public TMP_Text TextAnchorLocation;
+        public TMP_Text TextContentRoom;
+        public TMP_Text TextTransform;
+        public bool IsPlacementAnchor;
 
-        TextAnchorLocation.text = AnchorLocation.ToString();
-        TextContentRoom.text = ContentRoom.ToString();
+        private AnchorManager anchorManager;
+        private AnchorBinder binder;
+        private int currentAnchorLocationIndex;
+        private int currentAnchorRoomIndex;
+        private Vector3 lastPos;
 
-        TextTransform.text = transform.position.ToString();
 
-        //if (GetComponent<OVRSpatialAnchor>())
-        //    BindRelationObject();
-    }
-
-    private void Update()
-    {
-        if (transform.position != lastPos)
+        void Start()
         {
+            anchorManager = FindObjectOfType<AnchorManager>();
+            binder = FindObjectOfType<AnchorBinder>();
+            if (!IsPlacementAnchor)
+                binder.AllAnchors.Add(this);
+
+            TextAnchorLocation.text = AnchorLocation.ToString();
+            TextContentRoom.text = ContentRoom.ToString();
+
             TextTransform.text = transform.position.ToString();
-            lastPos = transform.position;
+
+            //if (GetComponent<OVRSpatialAnchor>())
+            //    BindRelationObject();
         }
-    }
 
-    private void OnDestroy()
-    {
-        binder.AllAnchors.Remove(this);
-    }
+        private void Update()
+        {
+            if (transform.position != lastPos)
+            {
+                TextTransform.text = transform.position.ToString();
+                lastPos = transform.position;
+            }
+        }
 
-    [ContextMenu("Erase")]
-    public void Erase()
-    {
-        anchorManager.EraseAnchor(GetComponent<OVRSpatialAnchor>());
-    }
+        private void OnDestroy()
+        {
+            binder.AllAnchors.Remove(this);
+        }
 
-    [ContextMenu("Save")]
-    public async void Save()
-    {
-        GameObject copy = Instantiate(gameObject);
-        Destroy(copy.GetComponent<Collider>());
-        copy.GetComponent<AnchorTester>().IsPlacementAnchor = false;
-        OVRSpatialAnchor anchor = copy.AddComponent<OVRSpatialAnchor>();
-        await Task.Delay(1000);
-        anchorManager.SaveAnchor(anchor, AnchorLocation, ContentRoom);
-    }
+        [ContextMenu("Erase")]
+        public void Erase()
+        {
+            anchorManager.EraseAnchor(GetComponent<OVRSpatialAnchor>());
+        }
+
+        [ContextMenu("Save")]
+        public async void Save()
+        {
+            GameObject copy = Instantiate(gameObject);
+            Destroy(copy.GetComponent<Collider>());
+            copy.GetComponent<AnchorTester>().IsPlacementAnchor = false;
+            OVRSpatialAnchor anchor = copy.AddComponent<OVRSpatialAnchor>();
+            await Task.Delay(1000);
+            anchorManager.SaveAnchor(anchor, AnchorLocation, ContentRoom);
+        }
 
 
 
-    public void ChangeAnchorLocation(bool next)
-    {
-        int length = Enum.GetNames(typeof(MarkerLocation)).Length;
+        public void ChangeAnchorLocation(bool next)
+        {
+            int length = Enum.GetNames(typeof(MarkerLocation)).Length;
 
-        currentAnchorLocationIndex = next ? currentAnchorLocationIndex + 1 : currentAnchorLocationIndex - 1;
+            currentAnchorLocationIndex = next ? currentAnchorLocationIndex + 1 : currentAnchorLocationIndex - 1;
 
-        if (currentAnchorLocationIndex >= length)
-            currentAnchorLocationIndex = 0;
-        if (currentAnchorLocationIndex < 0)
-            currentAnchorLocationIndex = length - 1;
+            if (currentAnchorLocationIndex >= length)
+                currentAnchorLocationIndex = 0;
+            if (currentAnchorLocationIndex < 0)
+                currentAnchorLocationIndex = length - 1;
 
-        MarkerLocation current = (MarkerLocation)currentAnchorLocationIndex;
+            MarkerLocation current = (MarkerLocation)currentAnchorLocationIndex;
 
-        AnchorLocation = current;
-        TextAnchorLocation.text = current.ToString();
-    }
+            AnchorLocation = current;
+            TextAnchorLocation.text = current.ToString();
+        }
 
-    public void ChangeAnchorRoom()
-    {
-        int length = Enum.GetNames(typeof(ContentRoom)).Length;
+        public void ChangeAnchorRoom()
+        {
+            int length = Enum.GetNames(typeof(ContentRoom)).Length;
 
-        currentAnchorRoomIndex++;
+            currentAnchorRoomIndex++;
 
-        if (currentAnchorRoomIndex >= length)
-            currentAnchorRoomIndex = 0;
-        if (currentAnchorRoomIndex < 0)
-            currentAnchorRoomIndex = length - 1;
+            if (currentAnchorRoomIndex >= length)
+                currentAnchorRoomIndex = 0;
+            if (currentAnchorRoomIndex < 0)
+                currentAnchorRoomIndex = length - 1;
 
-        ContentRoom current = (ContentRoom)currentAnchorRoomIndex;
+            ContentRoom current = (ContentRoom)currentAnchorRoomIndex;
 
-        ContentRoom = current;
-        TextContentRoom.text = current.ToString();
+            ContentRoom = current;
+            TextContentRoom.text = current.ToString();
+        }
     }
 }
