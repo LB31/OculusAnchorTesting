@@ -14,6 +14,11 @@ namespace SpatialAnchor
         GameObject hoverObject = null;
         GameObject grabObject = null;
 
+        [Range(-1f, 1f)]
+        public float PassthroughBrightness = -1;
+        [Range(-1f, 1f)]
+        public float PassthroughContrast = -1;
+
         #region private fields from another mother
         // all-purpose timer to use for blending after object is grabbed/released
         float grabTime = 0.0f;
@@ -34,10 +39,16 @@ namespace SpatialAnchor
         {
             if (passthrough)
             {
-                passthrough.colorMapEditorBrightness = -1;
-                passthrough.colorMapEditorContrast = -1;
+                //passthrough.colorMapEditorBrightness = -1;
+                //passthrough.colorMapEditorContrast = -1;
+                passthrough.SetBrightnessContrastSaturation(PassthroughBrightness, PassthroughContrast);
             }
             StartCoroutine(StartDemo());
+        }
+
+        private void OnValidate()
+        {
+            passthrough.SetBrightnessContrastSaturation(PassthroughBrightness, PassthroughContrast);
         }
 
         void Update()
@@ -82,19 +93,19 @@ namespace SpatialAnchor
 
         private void TrackButtonInput()
         {
-            AnchorTester anchor = null;
+            AnchorController anchor = null;
             if (grabObject)
-                anchor = grabObject.GetComponent<AnchorTester>();
+                anchor = grabObject.GetComponent<AnchorController>();
             if (anchor == null) return;
 
             // Place object
             if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger) || OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger))
                 anchor.Save();
             // Change anchor type
-            if (OVRInput.GetDown(OVRInput.RawButton.A))
-                anchor.ChangeAnchorLocation(true);
-            if (OVRInput.GetDown(OVRInput.RawButton.B))
-                anchor.ChangeAnchorLocation(false);
+            //if (OVRInput.GetDown(OVRInput.RawButton.A))
+            //    anchor.ChangeAnchorLocation(true);
+            //if (OVRInput.GetDown(OVRInput.RawButton.B))
+            //    anchor.ChangeAnchorLocation(false);
             // Erase Object
             if (OVRInput.GetDown(OVRInput.RawButton.X))
                 anchor.Erase();

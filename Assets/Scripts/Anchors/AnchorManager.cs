@@ -111,7 +111,7 @@ namespace SpatialAnchor
 
         private void RestoreAnchor(OVRSpatialAnchor anchor)
         {
-            AnchorTester tester = anchor.GetComponent<AnchorTester>();
+            AnchorController tester = anchor.GetComponent<AnchorController>();
             AnchorData anchorData = GetAnchorFromDatabase(anchor);
             tester.AnchorLocation = anchorData.MarkerLocation;
             tester.ContentRoom = anchorData.ContentRoom;
@@ -135,7 +135,7 @@ namespace SpatialAnchor
             });
         }
 
-        public void ReadFile()
+        private void ReadFile()
         {
             // Does the file exist?
             if (File.Exists(anchorFile))
@@ -148,7 +148,7 @@ namespace SpatialAnchor
             }
         }
 
-        public void WriteFile()
+        private void WriteFile()
         {
             // Serialize the object into JSON and save string
             string jsonString = JsonUtility.ToJson(anchorDatabase);

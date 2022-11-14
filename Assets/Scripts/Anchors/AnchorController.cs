@@ -8,7 +8,7 @@ using static CustomEnums;
 
 namespace SpatialAnchor
 {
-    public class AnchorTester : MonoBehaviour
+    public class AnchorController : MonoBehaviour
     {
         public MarkerLocation AnchorLocation;
         public ContentRoom ContentRoom;
@@ -18,7 +18,7 @@ namespace SpatialAnchor
         public bool IsPlacementAnchor;
 
         private AnchorManager anchorManager;
-        private AnchorBinder binder;
+        private AnchorObjectBinder binder;
         private int currentAnchorLocationIndex;
         private int currentAnchorRoomIndex;
         private Vector3 lastPos;
@@ -27,7 +27,7 @@ namespace SpatialAnchor
         void Start()
         {
             anchorManager = FindObjectOfType<AnchorManager>();
-            binder = FindObjectOfType<AnchorBinder>();
+            binder = FindObjectOfType<AnchorObjectBinder>();
             if (!IsPlacementAnchor)
                 binder.AllAnchors.Add(this);
 
@@ -63,12 +63,26 @@ namespace SpatialAnchor
         [ContextMenu("Save")]
         public async void Save()
         {
-            GameObject copy = Instantiate(gameObject);
-            Destroy(copy.GetComponent<Collider>());
-            copy.GetComponent<AnchorTester>().IsPlacementAnchor = false;
-            OVRSpatialAnchor anchor = copy.AddComponent<OVRSpatialAnchor>();
-            await Task.Delay(1000);
-            anchorManager.SaveAnchor(anchor, AnchorLocation, ContentRoom);
+            foreach (MarkerLocation marker in Enum.GetValues(typeof(MarkerLocation)))
+            {
+                GameObject copy = Instantiate(gameObject);
+                //Destroy(copy.GetComponent<Collider>());
+
+                // Set position
+                if(marker != 0)
+                {
+                    
+                }
+
+                AnchorController anchorCon = copy.GetComponent<AnchorController>();
+                anchorCon.IsPlacementAnchor = false;
+                anchorCon.AnchorLocation = marker;
+
+                OVRSpatialAnchor anchor = copy.AddComponent<OVRSpatialAnchor>();
+
+                await Task.Delay(1000);
+                anchorManager.SaveAnchor(anchor, AnchorLocation, ContentRoom);
+            }
         }
 
 

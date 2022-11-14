@@ -11,12 +11,12 @@ using static CustomEnums;
 
 namespace SpatialAnchor
 {
-    public class AnchorBinder : MonoBehaviour
+    public class AnchorObjectBinder : MonoBehaviour
     {
         public AnchorManager AnchorManager;
         public Transform Player;
         public float TimeTillNextCheck = 10;
-        public List<AnchorTester> AllAnchors = new();
+        public List<AnchorController> AllAnchors = new();
 
         public List<RoomObject> RoomObjects = new();
 
@@ -29,10 +29,10 @@ namespace SpatialAnchor
             {
                 t = 0;
                 // Find nearest anchor
-                AnchorTester nearestAnchor = FindNearestAnchor();
+                AnchorController nearestAnchor = FindNearestAnchor();
 
                 // Bind play area
-                if (nearestAnchor != null)
+                if (nearestAnchor != null && !nearestAnchor.IsPlacementAnchor)
                 {
                     BindRelationObject(nearestAnchor);
                     Debug.Log(nearestAnchor.AnchorLocation, nearestAnchor.gameObject);
@@ -41,11 +41,11 @@ namespace SpatialAnchor
             }
         }
 
-        private AnchorTester FindNearestAnchor()
+        private AnchorController FindNearestAnchor()
         {
             float nearest = float.MaxValue;
-            AnchorTester nearestAnchor = null;
-            foreach (AnchorTester anchor in AllAnchors)
+            AnchorController nearestAnchor = null;
+            foreach (AnchorController anchor in AllAnchors)
             {
                 float distnace = Vector3.Distance(Player.position, anchor.transform.position);
                 if (distnace < nearest)
@@ -58,19 +58,19 @@ namespace SpatialAnchor
             return nearestAnchor;
         }
 
-        public void BindRelationObject(AnchorTester nearestAnchor)
+        public void BindRelationObject(AnchorController nearestAnchor)
         {
-            Transform obj = GetRoomObject(nearestAnchor.ContentRoom).transform; // TODO 
-            obj.gameObject.SetActive(true);
+            Transform roomObj = GetRoomObject(nearestAnchor.ContentRoom).transform; // TODO 
+            roomObj.gameObject.SetActive(true);
 
-            obj.parent = nearestAnchor.transform;
-            obj.localPosition = Vector3.zero;
+            roomObj.parent = nearestAnchor.transform;
+            roomObj.localPosition = Vector3.zero;
 
-            obj.localPosition += GetMarkerPosition(obj, nearestAnchor.AnchorLocation);
+            roomObj.localPosition += GetMarkerPosition(roomObj, nearestAnchor.AnchorLocation);
 
-            obj.localRotation = Quaternion.identity;
+            roomObj.localRotation = Quaternion.identity;
 
-            obj.parent = null;
+            roomObj.parent = null;
         }
 
         private Vector3 GetMarkerPosition(Transform relationObj, MarkerLocation location)
@@ -81,17 +81,23 @@ namespace SpatialAnchor
             switch (location)
             {
                 case MarkerLocation.DownLeft:
-                    return new Vector3(localScale.x * 0.5f, 0, localScale.z * 0.5f);
+                    result = new Vector3(localScale.x * 0.5f, 0, localScale.z * 0.5f);
+                    break;
                 case MarkerLocation.MiddleLeft:
-                    return new Vector3(localScale.x * 0.5f, 0, 0);
+                    result = new Vector3(localScale.x * 0.5f, 0, 0);
+                    break;
                 case MarkerLocation.UpLeft:
-                    return new Vector3(localScale.x * 0.5f, 0, -localScale.z * 0.5f);
+                    result = new Vector3(localScale.x * 0.5f, 0, -localScale.z * 0.5f);
+                    break;
                 case MarkerLocation.DownRight:
-                    return new Vector3(-localScale.x * 0.5f, 0, localScale.z * 0.5f);
+                    result = new Vector3(-localScale.x * 0.5f, 0, localScale.z * 0.5f);
+                    break;
                 case MarkerLocation.MiddleRight:
-                    return new Vector3(-localScale.x * 0.5f, 0, 0);
+                    result = new Vector3(-localScale.x * 0.5f, 0, 0);
+                    break;
                 case MarkerLocation.UpRight:
-                    return new Vector3(-localScale.x * 0.5f, 0, -localScale.z * 0.5f);
+                    result = new Vector3(-localScale.x * 0.5f, 0, -localScale.z * 0.5f);
+                    break;
                 default:
                     break;
             }
@@ -102,6 +108,27 @@ namespace SpatialAnchor
         private GameObject GetRoomObject(ContentRoom type)
         {
             return RoomObjects.FirstOrDefault(obj => obj.RoomType.Equals(type)).Prefab;
+        }
+
+        public Vector3 GetNextAnchorPosition(MarkerLocation location)
+        {
+            switch (location)
+            {
+                case MarkerLocation.DownLeft:
+                    break;
+                case MarkerLocation.MiddleLeft:
+                    break;
+                case MarkerLocation.UpLeft:
+                    break;
+                case MarkerLocation.DownRight:
+                    break;
+                case MarkerLocation.MiddleRight:
+                    break;
+                case MarkerLocation.UpRight:
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
