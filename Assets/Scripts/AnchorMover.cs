@@ -71,41 +71,38 @@ namespace SpatialAnchor
             grabTime = Mathf.Clamp01(grabTime);
             ManipulateObject(grabObject, controllerPos, controllerRot);
 
-            AnchorTester anchor = grabObject.GetComponent<AnchorTester>();
 
             if (!OVRInput.Get(OVRInput.Button.PrimaryHandTrigger, controller))
             {
                 ReleaseObject();
             }
 
-            // Change anchor type
-            if (OVRInput.GetDown(OVRInput.RawButton.A))
-            {
-                anchor.ChangeAnchorLocation(true);
-            }
-            if (OVRInput.GetDown(OVRInput.RawButton.B))
-            {
-                anchor.ChangeAnchorLocation(false);
-            }
-            // Change room type
-            if (OVRInput.GetDown(OVRInput.RawButton.Y))
-            {
-                anchor.ChangeAnchorRoom();
-            }
+            TrackButtonInput();
+        }
+
+        private void TrackButtonInput()
+        {
+            AnchorTester anchor = null;
+            if (grabObject)
+                anchor = grabObject.GetComponent<AnchorTester>();
+            if (anchor == null) return;
+
             // Place object
             if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger) || OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger))
-            {
                 anchor.Save();
-            }
+            // Change anchor type
+            if (OVRInput.GetDown(OVRInput.RawButton.A))
+                anchor.ChangeAnchorLocation(true);
+            if (OVRInput.GetDown(OVRInput.RawButton.B))
+                anchor.ChangeAnchorLocation(false);
             // Erase Object
             if (OVRInput.GetDown(OVRInput.RawButton.X))
-            {
                 anchor.Erase();
-            }
+            // Change room type
+            if (OVRInput.GetDown(OVRInput.RawButton.Y))
+                anchor.ChangeAnchorRoom();
+
             // TODO automatically place anchors according to placed one
-
-
-
         }
 
         void GrabHoverObject(GameObject grbObj, Vector3 controllerPos, Quaternion controllerRot)
