@@ -20,10 +20,40 @@ namespace SpatialAnchor
 
         public List<RoomObject> RoomObjects = new();
 
+        private float width, length;
+
+        private bool start;
+
         private float t;
+
+        private void Start()
+        {
+            width = transform.lossyScale.x;
+            length = transform.lossyScale.z;
+        }
+
+        public void Initialize()
+        {
+            AnchorController first = AllAnchors.FirstOrDefault(a => a.LocalPosition.Equals(Vector2.zero));
+
+            Transform startParent = first.transform;
+
+            transform.parent = startParent;
+            transform.localRotation = Quaternion.identity;
+
+            float scaleNormalizerX = 1f / startParent.lossyScale.x;
+            float scaleNormalizerZ = 1f / startParent.lossyScale.z;
+
+            transform.localPosition = Vector3.zero;
+            transform.localPosition += new Vector3(width * 0.5f * scaleNormalizerX, 0, length * 0.5f * scaleNormalizerZ);
+
+            start = true;
+        }
 
         private void Update()
         {
+            if (!start) return;
+
             t += Time.deltaTime;
             if (t >= TimeTillNextCheck)
             {
@@ -35,7 +65,6 @@ namespace SpatialAnchor
                 if (nearestAnchor != null && !nearestAnchor.IsPlacementAnchor)
                 {
                     BindRelationObject(nearestAnchor);
-                    Debug.Log(nearestAnchor.AnchorLocation, nearestAnchor.gameObject);
                 }
 
             }
@@ -58,64 +87,15 @@ namespace SpatialAnchor
             return nearestAnchor;
         }
 
-        public void BindRelationObject(AnchorController nearestAnchor)
+        public void BindRelationObject(AnchorController target)
         {
-            Transform roomObj = GetRoomObject(nearestAnchor.ContentRoom).transform; // TODO 
-            roomObj.gameObject.SetActive(true);
-
-            roomObj.parent = nearestAnchor.transform;
-            roomObj.localPosition = Vector3.zero;
-
-            roomObj.localPosition += GetMarkerPosition(roomObj, nearestAnchor.AnchorLocation);
-
-            roomObj.localRotation = Quaternion.identity;
-
-            roomObj.parent = null;
-        }
-
-        public Vector3 GetMarkerPosition(Transform relationObj, MarkerLocation location)
-        {
-            Vector3 result = Vector3.zero;
-            Vector3 localScale = relationObj.localScale;
-
-            switch (location)
-            {
-                case MarkerLocation.DownLeft:
-                    result = new Vector3(localScale.x * 0.5f, 0, localScale.z * 0.5f);
-                    break;
-                case MarkerLocation.MiddleLeft:
-                    result = new Vector3(localScale.x * 0.5f, 0, 0);
-                    break;
-                case MarkerLocation.UpLeft:
-                    result = new Vector3(localScale.x * 0.5f, 0, -localScale.z * 0.5f);
-                    break;
-                case MarkerLocation.DownRight:
-                    result = new Vector3(-localScale.x * 0.5f, 0, localScale.z * 0.5f);
-                    break;
-                case MarkerLocation.MiddleRight:
-                    result = new Vector3(-localScale.x * 0.5f, 0, 0);
-                    break;
-                case MarkerLocation.UpRight:
-                    result = new Vector3(-localScale.x * 0.5f, 0, -localScale.z * 0.5f);
-                    break;
-                default:
-                    break;
-            }
-
-            return result;
+            transform.parent = target.transform;
         }
 
         public GameObject GetRoomObject(ContentRoom type)
         {
             return RoomObjects.FirstOrDefault(obj => obj.RoomType.Equals(type)).Prefab;
         }
-
-        public Vector3 GetNextAnchorPosition(MarkerLocation location, ContentRoom roomType)
-        {
-            GameObject room = GetRoomObject(roomType);
-            return GetMarkerPosition(room.transform, location);
-        }
-
     }
 
     [Serializable]

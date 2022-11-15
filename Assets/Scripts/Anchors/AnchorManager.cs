@@ -30,7 +30,7 @@ namespace SpatialAnchor
             LoadAnchorsByUuid();
         }
 
-        public void SaveAnchor(OVRSpatialAnchor _spatialAnchor, MarkerLocation location, ContentRoom room)
+        public void SaveAnchor(OVRSpatialAnchor _spatialAnchor, Vector2 location, ContentRoom room)
         {
             _spatialAnchor.Save((anchor, success) =>
             {
@@ -111,10 +111,13 @@ namespace SpatialAnchor
 
         private void RestoreAnchor(OVRSpatialAnchor anchor)
         {
-            AnchorController tester = anchor.GetComponent<AnchorController>();
+            AnchorController anchorCon = anchor.GetComponent<AnchorController>();
             AnchorData anchorData = GetAnchorFromDatabase(anchor);
-            tester.AnchorLocation = anchorData.MarkerLocation;
-            tester.ContentRoom = anchorData.ContentRoom;
+            anchorCon.LocalPosition = anchorData.MarkerLocation;
+            anchorCon.ContentRoom = anchorData.ContentRoom;
+
+            if (anchorCon.LocalPosition.Equals(Vector2.zero))
+                anchorCon.Binder.Initialize(); // TODO change ugly spaghetti code
         }
 
         public void EraseAnchor(OVRSpatialAnchor _spatialAnchor)

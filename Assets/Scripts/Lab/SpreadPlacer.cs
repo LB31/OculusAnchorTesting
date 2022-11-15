@@ -27,18 +27,16 @@ public class SpreadPlacer : MonoBehaviour
         Vector2 anchorAmounts = GetAnchorAmounts(room.transform);
         bool first = true;
 
+        float x;
+        float z;
+
         for (int i = 0; i <= anchorAmounts.x; i++)
         {
             for (int j = 0; j <= anchorAmounts.y; j++)
             {
-                // x * i + j
-
                 Transform copy = Instantiate(Anchor).transform;
 
-                copy.name += " " + i + " " + j;
-
-                float x;
-                float z;
+                copy.name += " " + i + " " + j;              
 
                 // Set position
                 if (!first)
@@ -67,7 +65,7 @@ public class SpreadPlacer : MonoBehaviour
                 }
 
                 LabAnchor la = copy.gameObject.AddComponent<LabAnchor>();
-                la.PositionInRoom = new Vector2(x, z);
+                la.LocalPosition = new Vector2(x, z);
                 lb.AllAnchors.Add(la);
             }
         }

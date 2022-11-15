@@ -4,5 +4,5 @@ using UnityEngine;
 
 public class LabAnchor : MonoBehaviour
 {
-    public Vector2 PositionInRoom;
+    public Vector2 LocalPosition;
 }

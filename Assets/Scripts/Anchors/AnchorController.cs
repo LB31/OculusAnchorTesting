@@ -10,28 +10,31 @@ namespace SpatialAnchor
 {
     public class AnchorController : MonoBehaviour
     {
-        public MarkerLocation AnchorLocation;
+        public Vector2 LocalPosition;
         public ContentRoom ContentRoom;
-        public TMP_Text TextAnchorLocation;
+        public TMP_Text TextLocalPosition;
         public TMP_Text TextContentRoom;
         public TMP_Text TextTransform;
         public bool IsPlacementAnchor;
+        [HideInInspector]
+        public AnchorObjectBinder Binder;
 
         private AnchorManager anchorManager;
-        private AnchorObjectBinder binder;
         private int currentAnchorLocationIndex;
         private int currentAnchorRoomIndex;
         private Vector3 lastPos;
+
+        private float distanceBetweenAnchors = 3;
 
 
         void Start()
         {
             anchorManager = FindObjectOfType<AnchorManager>();
-            binder = FindObjectOfType<AnchorObjectBinder>();
+            Binder = FindObjectOfType<AnchorObjectBinder>();
             if (!IsPlacementAnchor)
-                binder.AllAnchors.Add(this);
+                Binder.AllAnchors.Add(this);
 
-            TextAnchorLocation.text = AnchorLocation.ToString();
+            TextLocalPosition.text = LocalPosition.ToString();
             TextContentRoom.text = ContentRoom.ToString();
 
             TextTransform.text = transform.position.ToString();
@@ -51,7 +54,7 @@ namespace SpatialAnchor
 
         private void OnDestroy()
         {
-            binder.AllAnchors.Remove(this);
+            Binder.AllAnchors.Remove(this);
         }
 
         [ContextMenu("Erase")]
@@ -64,60 +67,71 @@ namespace SpatialAnchor
         public async void Save()
         {
             Transform startParent = null;
+            Transform copy = null;
+            GameObject room = Binder.GetRoomObject(ContentRoom);
 
-            foreach (MarkerLocation location in Enum.GetValues(typeof(MarkerLocation)))
+            Vector2 anchorAmounts = GetAnchorAmounts(room.transform);
+            bool first = true;
+
+            float x;
+            float z;
+
+            for (int i = 0; i <= anchorAmounts.x; i++)
             {
-
-                Transform copy = Instantiate(gameObject).transform;
-                //Destroy(copy.GetComponent<Collider>());
-
-                AnchorController anchorCon = copy.GetComponent<AnchorController>();
-                anchorCon.IsPlacementAnchor = false;
-                anchorCon.AnchorLocation = location;
-
-                copy.name += location.ToString();
-
-                // Set position
-                if (location != 0)
+                for (int j = 0; j <= anchorAmounts.y; j++)
                 {
-                    copy.parent = startParent;
-                    copy.localPosition = Vector3.zero;
+                    copy = Instantiate(gameObject).transform;
 
-                    Vector3 nextPos = binder.GetNextAnchorPosition(location, anchorCon.ContentRoom);
-                    copy.localPosition += nextPos;
+                    copy.name += " " + i + " " + j;
 
-                    copy.localRotation = Quaternion.identity;
-                    //copy.parent = null;
+                    // Set position
+                    if (!first)
+                    {
+                        copy.parent = startParent;
+                        copy.localPosition = Vector3.zero;
+
+                        float scaleNormalizerX = 1f / startParent.lossyScale.x;
+                        float scaleNormalizerZ = 1f / startParent.lossyScale.z;
+
+                        x = i;
+                        z = j;
+
+                        copy.localPosition += new Vector3(i * distanceBetweenAnchors * scaleNormalizerX, 0, j * distanceBetweenAnchors * scaleNormalizerZ);
+
+                        copy.localRotation = Quaternion.identity;
+                        //copy.parent = null;
+
+                        copy.parent = null;
+                    }
+                    else
+                    {
+                        startParent = copy;
+                        first = false;
+                        x = z = 0;
+                    }
+
+                    AnchorController acCopy = copy.GetComponent<AnchorController>();
+                    acCopy.IsPlacementAnchor = false;
+                    acCopy.LocalPosition = new Vector2(x, z);
                 }
-                else
-                {
-                    startParent = copy;
-                }
-
-                //OVRSpatialAnchor anchor = copy.AddComponent<OVRSpatialAnchor>();
-
-                await Task.Delay(1000);
-                //anchorManager.SaveAnchor(anchor, AnchorLocation, ContentRoom);
             }
+
+
+            OVRSpatialAnchor anchor = copy.gameObject.AddComponent<OVRSpatialAnchor>();
+            await Task.Delay(1000);
+            Binder.Initialize();
+            anchorManager.SaveAnchor(anchor, LocalPosition, ContentRoom);
+
         }
 
-
-
-        public void ChangeAnchorLocation(bool next)
+        private Vector2 GetAnchorAmounts(Transform room)
         {
-            int length = Enum.GetNames(typeof(MarkerLocation)).Length;
+            float width = room.lossyScale.x;
+            float length = room.lossyScale.z;
+            int neededAnchorsX = (int)(width / distanceBetweenAnchors);
+            int neededAnchorsZ = (int)(length / distanceBetweenAnchors);
 
-            currentAnchorLocationIndex = next ? currentAnchorLocationIndex + 1 : currentAnchorLocationIndex - 1;
-
-            if (currentAnchorLocationIndex >= length)
-                currentAnchorLocationIndex = 0;
-            if (currentAnchorLocationIndex < 0)
-                currentAnchorLocationIndex = length - 1;
-
-            MarkerLocation current = (MarkerLocation)currentAnchorLocationIndex;
-
-            AnchorLocation = current;
-            TextAnchorLocation.text = current.ToString();
+            return new Vector2(neededAnchorsX, neededAnchorsZ);
         }
 
         public void ChangeAnchorRoom()

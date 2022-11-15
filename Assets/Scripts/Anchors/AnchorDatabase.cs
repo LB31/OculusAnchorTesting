@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using static CustomEnums;
 /// <summary>
 /// Data structure used to serialize a <see cref="AnchorDatabase"/> object
@@ -20,12 +21,12 @@ namespace SpatialAnchor
         public string SpaceUuid;
         // Name of the prefab associated with this anchor
         public string PrefabName;
-        // Location of marker in the room
-        public MarkerLocation MarkerLocation;
+        // Local position of marker in the room
+        public Vector2 MarkerLocation;
         // Room that is connected with the anchor
         public ContentRoom ContentRoom;
 
-        public AnchorData(string spaceUuid, string prefabName, MarkerLocation markerLocation, ContentRoom contentRoom)
+        public AnchorData(string spaceUuid, string prefabName, Vector2 markerLocation, ContentRoom contentRoom)
         {
             SpaceUuid = spaceUuid;
             PrefabName = prefabName;

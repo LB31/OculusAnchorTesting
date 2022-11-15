@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class LabBinder : MonoBehaviour
 {
@@ -15,11 +16,18 @@ public class LabBinder : MonoBehaviour
     {
         width = transform.lossyScale.x;
         length = transform.lossyScale.z;
+
+        if(AllAnchors.Count > 0)
+        {
+            Debug.Log(AllAnchors.Count);
+        }
     }
 
     public void Initialize()
     {
-        Transform startParent = AllAnchors[0].transform;
+        LabAnchor first = AllAnchors.FirstOrDefault(a => a.LocalPosition.Equals(Vector2.zero));
+
+        Transform startParent = first.transform;
 
         transform.parent = startParent;
         transform.localRotation = Quaternion.identity;
