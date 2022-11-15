@@ -80,9 +80,6 @@ namespace SpatialAnchor
 
             switch (location)
             {
-                case MarkerLocation.Middle:
-                    result = new Vector3(localScale.x * 0.5f, 0, localScale.z * 0.5f);
-                    break;
                 case MarkerLocation.DownLeft:
                     result = new Vector3(localScale.x * 0.5f, 0, localScale.z * 0.5f);
                     break;
@@ -108,7 +105,7 @@ namespace SpatialAnchor
             return result;
         }
 
-        private GameObject GetRoomObject(ContentRoom type)
+        public GameObject GetRoomObject(ContentRoom type)
         {
             return RoomObjects.FirstOrDefault(obj => obj.RoomType.Equals(type)).Prefab;
         }
@@ -118,6 +115,7 @@ namespace SpatialAnchor
             GameObject room = GetRoomObject(roomType);
             return GetMarkerPosition(room.transform, location);
         }
+
     }
 
     [Serializable]

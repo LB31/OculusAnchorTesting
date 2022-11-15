@@ -2,7 +2,6 @@ public class CustomEnums
 {
     public enum MarkerLocation
     {
-        Middle,
         DownLeft,
         MiddleLeft,
         UpLeft,
