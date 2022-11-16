@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using static CustomEnums;
+using System.Threading.Tasks;
 
 /// <summary>
 /// Let target objects follow anchors that are responsible for them
@@ -26,26 +27,32 @@ namespace SpatialAnchor
 
         private float t;
 
-        private void Start()
+        public async void Initialize()
         {
-            width = transform.lossyScale.x;
-            length = transform.lossyScale.z;
-        }
+            while (AllAnchors.Count == 0)
+            {
+                await Task.Yield();
+            }
 
-        public void Initialize()
-        {
             AnchorController first = AllAnchors.FirstOrDefault(a => a.LocalPosition.Equals(Vector2.zero));
 
             Transform startParent = first.transform;
 
-            transform.parent = startParent;
-            transform.localRotation = Quaternion.identity;
+            // Set parent
+            BindRelationObject(first);
+            Transform room = GetRoomObject(first.ContentRoom).transform;
+            room.gameObject.SetActive(true);
+
+            width = room.transform.lossyScale.x;
+            length = room.transform.lossyScale.z;
+
+            room.localRotation = Quaternion.identity;
 
             float scaleNormalizerX = 1f / startParent.lossyScale.x;
             float scaleNormalizerZ = 1f / startParent.lossyScale.z;
 
-            transform.localPosition = Vector3.zero;
-            transform.localPosition += new Vector3(width * 0.5f * scaleNormalizerX, 0, length * 0.5f * scaleNormalizerZ);
+            room.localPosition = Vector3.zero;
+            room.localPosition += new Vector3(width * 0.5f * scaleNormalizerX, 0, length * 0.5f * scaleNormalizerZ);
 
             start = true;
         }
@@ -89,7 +96,7 @@ namespace SpatialAnchor
 
         public void BindRelationObject(AnchorController target)
         {
-            transform.parent = target.transform;
+            GetRoomObject(target.ContentRoom).transform.parent = target.transform;
         }
 
         public GameObject GetRoomObject(ContentRoom type)

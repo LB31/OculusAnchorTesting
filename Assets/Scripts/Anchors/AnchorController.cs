@@ -26,8 +26,12 @@ namespace SpatialAnchor
 
         private float distanceBetweenAnchors = 3;
 
+        private void Start()
+        {
+            TryInitialize();
+        }
 
-        void Start()
+        public void TryInitialize()
         {
             anchorManager = FindObjectOfType<AnchorManager>();
             Binder = FindObjectOfType<AnchorObjectBinder>();
@@ -112,6 +116,7 @@ namespace SpatialAnchor
 
                     AnchorController acCopy = copy.GetComponent<AnchorController>();
                     acCopy.IsPlacementAnchor = false;
+                    acCopy.TryInitialize();
                     acCopy.LocalPosition = new Vector2(x, z);
                 }
             }

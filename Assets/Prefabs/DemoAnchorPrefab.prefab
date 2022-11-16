@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 614884526}
   - component: {fileID: 614884525}
   m_Layer: 0
-  m_Name: TypeText
+  m_Name: LocalPosText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -752,12 +752,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f83de5f87546d8d4098c5987463b8872, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AnchorLocation: 0
+  LocalPosition: {x: 0, y: 0}
   ContentRoom: 0
-  TextAnchorLocation: {fileID: 614884525}
+  TextLocalPosition: {fileID: 614884525}
   TextContentRoom: {fileID: 6641118013375735387}
   TextTransform: {fileID: 1624488568}
   IsPlacementAnchor: 0
+  Binder: {fileID: 0}
 --- !u!1 &1012942001503549123
 GameObject:
   m_ObjectHideFlags: 0
