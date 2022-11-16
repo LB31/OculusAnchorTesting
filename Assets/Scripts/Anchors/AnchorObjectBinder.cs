@@ -27,24 +27,32 @@ namespace SpatialAnchor
 
         private float t;
 
-        public async void Initialize()
+        public void TryInitialize()
         {
-            while (AllAnchors.Count == 0)
+            if (AllAnchors.Count == 0) return;
+
+            foreach (RoomObject room in RoomObjects)
             {
-                await Task.Yield();
+                AnchorController zeroElement = AllAnchors.FirstOrDefault(a => a.LocalPosition.Equals(Vector2.zero) && a.ContentRoom.CompareTo(room.RoomType) == 0);
+                if (zeroElement && !room.Binded)
+                    Initialize(room, zeroElement.transform);
             }
 
-            AnchorController first = AllAnchors.FirstOrDefault(a => a.LocalPosition.Equals(Vector2.zero));
+            // Are all rooms binded?
+            if(RoomObjects.All(r => r.Binded))
+                start = true;
+        }
 
-            Transform startParent = first.transform;
+        public void Initialize(RoomObject contentRoom, Transform startParent)
+        {
+            Debug.Log("Initialize " + contentRoom.Prefab.name);
+            contentRoom.Binded = true;
 
-            // Set parent
-            BindRelationObject(first);
-            Transform room = GetRoomObject(first.ContentRoom).transform;
-            room.gameObject.SetActive(true);
+            Transform room = contentRoom.Prefab.transform;
+            width = room.lossyScale.x;
+            length = room.lossyScale.z;
 
-            width = room.transform.lossyScale.x;
-            length = room.transform.lossyScale.z;
+            room.parent = startParent;
 
             room.localRotation = Quaternion.identity;
 
@@ -54,12 +62,16 @@ namespace SpatialAnchor
             room.localPosition = Vector3.zero;
             room.localPosition += new Vector3(width * 0.5f * scaleNormalizerX, 0, length * 0.5f * scaleNormalizerZ);
 
-            start = true;
+            room.gameObject.SetActive(true);
         }
 
         private void Update()
         {
-            if (!start) return;
+            if (!start)
+            {
+                TryInitialize();
+                return;
+            }
 
             t += Time.deltaTime;
             if (t >= TimeTillNextCheck)
@@ -96,19 +108,24 @@ namespace SpatialAnchor
 
         public void BindRelationObject(AnchorController target)
         {
-            GetRoomObject(target.ContentRoom).transform.parent = target.transform;
+            Transform room = GetRoomObject(target.ContentRoom).transform;
+            room.transform.parent = target.transform;
+            room.gameObject.SetActive(true);            
         }
 
         public GameObject GetRoomObject(ContentRoom type)
         {
             return RoomObjects.FirstOrDefault(obj => obj.RoomType.Equals(type)).Prefab;
         }
+
+
     }
 
     [Serializable]
-    public struct RoomObject
+    public class RoomObject
     {
         public ContentRoom RoomType;
         public GameObject Prefab;
+        public bool Binded;
     }
 }

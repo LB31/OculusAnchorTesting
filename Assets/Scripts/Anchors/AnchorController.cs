@@ -24,6 +24,8 @@ namespace SpatialAnchor
         private int currentAnchorRoomIndex;
         private Vector3 lastPos;
 
+        private Transform contentRoom;
+
         private float distanceBetweenAnchors = 3;
 
         private void Start()
@@ -38,11 +40,11 @@ namespace SpatialAnchor
             if (!IsPlacementAnchor)
                 Binder.AllAnchors.Add(this);
 
-            TextLocalPosition.text = LocalPosition.ToString();
+            TextLocalPosition.text = LocalPosition.ToString(); // TODO needed?
             TextContentRoom.text = ContentRoom.ToString();
-
             TextTransform.text = transform.position.ToString();
 
+            contentRoom = Binder.GetRoomObject(ContentRoom).transform;
             //if (GetComponent<OVRSpatialAnchor>())
             //    BindRelationObject();
         }
@@ -72,10 +74,10 @@ namespace SpatialAnchor
         {
             Transform startParent = null;
             Transform copy = null;
-            GameObject room = Binder.GetRoomObject(ContentRoom);
 
-            Vector2 anchorAmounts = GetAnchorAmounts(room.transform);
-            bool first = true;
+            Vector2 anchorAmounts = GetAnchorAmounts(contentRoom);
+
+            bool firstAnchor = true;
 
             float x;
             float z;
@@ -85,11 +87,10 @@ namespace SpatialAnchor
                 for (int j = 0; j <= anchorAmounts.y; j++)
                 {
                     copy = Instantiate(gameObject).transform;
-
                     copy.name += " " + i + " " + j;
 
                     // Set position
-                    if (!first)
+                    if (!firstAnchor)
                     {
                         copy.parent = startParent;
                         copy.localPosition = Vector3.zero;
@@ -97,36 +98,32 @@ namespace SpatialAnchor
                         float scaleNormalizerX = 1f / startParent.lossyScale.x;
                         float scaleNormalizerZ = 1f / startParent.lossyScale.z;
 
-                        x = i;
-                        z = j;
+                        x = i * distanceBetweenAnchors * scaleNormalizerX;
+                        z = j * distanceBetweenAnchors * scaleNormalizerZ;
 
-                        copy.localPosition += new Vector3(i * distanceBetweenAnchors * scaleNormalizerX, 0, j * distanceBetweenAnchors * scaleNormalizerZ);
+                        copy.localPosition += new Vector3(x, 0, z);
 
                         copy.localRotation = Quaternion.identity;
-                        //copy.parent = null;
 
                         copy.parent = null;
                     }
                     else
                     {
                         startParent = copy;
-                        first = false;
+                        firstAnchor = false;
                         x = z = 0;
                     }
 
                     AnchorController acCopy = copy.GetComponent<AnchorController>();
                     acCopy.IsPlacementAnchor = false;
-                    acCopy.TryInitialize();
                     acCopy.LocalPosition = new Vector2(x, z);
+                    acCopy.TryInitialize();
+
+                    OVRSpatialAnchor anchor = copy.gameObject.AddComponent<OVRSpatialAnchor>();
+                    await Task.Delay(1000);
+                    anchorManager.SaveAnchor(anchor, acCopy.LocalPosition, ContentRoom);
                 }
             }
-
-
-            OVRSpatialAnchor anchor = copy.gameObject.AddComponent<OVRSpatialAnchor>();
-            await Task.Delay(1000);
-            Binder.Initialize();
-            anchorManager.SaveAnchor(anchor, LocalPosition, ContentRoom);
-
         }
 
         private Vector2 GetAnchorAmounts(Transform room)
@@ -153,7 +150,12 @@ namespace SpatialAnchor
             ContentRoom current = (ContentRoom)currentAnchorRoomIndex;
 
             ContentRoom = current;
+            GameObject newRoom = Binder.GetRoomObject(ContentRoom);
+            if (newRoom)
+                contentRoom = newRoom.transform;
+
             TextContentRoom.text = current.ToString();
+
         }
     }
 }

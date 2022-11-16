@@ -115,9 +115,7 @@ namespace SpatialAnchor
             AnchorData anchorData = GetAnchorFromDatabase(anchor);
             anchorCon.LocalPosition = anchorData.MarkerLocation;
             anchorCon.ContentRoom = anchorData.ContentRoom;
-
-            if (anchorCon.LocalPosition.Equals(Vector2.zero))
-                anchorCon.Binder.Initialize(); // TODO change ugly spaghetti code
+            anchor.name += " " + anchorCon.LocalPosition;
         }
 
         public void EraseAnchor(OVRSpatialAnchor _spatialAnchor)
@@ -163,6 +161,12 @@ namespace SpatialAnchor
         private AnchorData GetAnchorFromDatabase(OVRSpatialAnchor _spatialAnchor)
         {
             return anchorDatabase.AnchorData.FirstOrDefault(id => id.SpaceUuid == _spatialAnchor.Uuid.ToString());
+        }
+
+        [ContextMenu("EraseAllAnchors")]
+        public void EraseAllAnchors()
+        {
+            // TODO
         }
 
     }
