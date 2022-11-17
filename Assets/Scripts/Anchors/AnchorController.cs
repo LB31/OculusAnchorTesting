@@ -65,7 +65,10 @@ namespace SpatialAnchor
 
         [ContextMenu("Erase")]
         public void Erase()
-        {
+        {          
+            Binder.AllAnchors.Remove(this);
+            Binder.UnbindRoom(contentRoom);
+
             anchorManager.EraseAnchor(GetComponent<OVRSpatialAnchor>());
         }
 
@@ -87,7 +90,7 @@ namespace SpatialAnchor
                 for (int j = 0; j <= anchorAmounts.y; j++)
                 {
                     copy = Instantiate(gameObject).transform;
-                    copy.name += " " + i + " " + j;
+                    copy.name += $"{ContentRoom} {i} {j}";
 
                     // Set position
                     if (!firstAnchor)
@@ -118,6 +121,7 @@ namespace SpatialAnchor
                     acCopy.IsPlacementAnchor = false;
                     acCopy.LocalPosition = new Vector2(x, z);
                     acCopy.TryInitialize();
+                    Binder.TryInitialize();
 
                     OVRSpatialAnchor anchor = copy.gameObject.AddComponent<OVRSpatialAnchor>();
                     await Task.Delay(1000);

@@ -17,7 +17,7 @@ namespace SpatialAnchor
         public AnchorManager AnchorManager;
         public Transform Player;
         public float TimeTillNextCheck = 10;
-        public List<AnchorController> AllAnchors = new();
+        public HashSet<AnchorController> AllAnchors = new();
 
         public List<RoomObject> RoomObjects = new();
 
@@ -63,6 +63,16 @@ namespace SpatialAnchor
             room.localPosition += new Vector3(width * 0.5f * scaleNormalizerX, 0, length * 0.5f * scaleNormalizerZ);
 
             room.gameObject.SetActive(true);
+        }
+
+        public void UnbindRoom(Transform room)
+        {
+            room.parent = null;
+            room.gameObject.SetActive(false);
+
+            RoomObject foundRoom = RoomObjects.FirstOrDefault(r => r.Prefab.name.Equals(room.gameObject.name));
+            if (foundRoom != null)
+                foundRoom.Binded = false;
         }
 
         private void Update()
