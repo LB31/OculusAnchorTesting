@@ -12,7 +12,6 @@ namespace SpatialAnchor
     {
         public Vector2 LocalPosition;
         public ContentRoom ContentRoom;
-        public TMP_Text TextLocalPosition;
         public TMP_Text TextContentRoom;
         public TMP_Text TextTransform;
         public bool IsPlacementAnchor;
@@ -40,7 +39,6 @@ namespace SpatialAnchor
             if (!IsPlacementAnchor)
                 Binder.AllAnchors.Add(this);
 
-            TextLocalPosition.text = LocalPosition.ToString(); // TODO needed?
             TextContentRoom.text = ContentRoom.ToString();
             TextTransform.text = transform.position.ToString();
 

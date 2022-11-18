@@ -99,13 +99,8 @@ namespace SpatialAnchor
             if (anchor == null) return;
 
             // Place object
-            if (OVRInput.GetDown(OVRInput.RawButton.RIndexTrigger) || OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger))
+            if (OVRInput.GetDown(OVRInput.RawButton.LIndexTrigger))
                 anchor.Save();
-            // Change anchor type
-            //if (OVRInput.GetDown(OVRInput.RawButton.A))
-            //    anchor.ChangeAnchorLocation(true);
-            //if (OVRInput.GetDown(OVRInput.RawButton.B))
-            //    anchor.ChangeAnchorLocation(false);
             // Erase Object
             if (OVRInput.GetDown(OVRInput.RawButton.X))
                 anchor.Erase();
@@ -113,7 +108,11 @@ namespace SpatialAnchor
             if (OVRInput.GetDown(OVRInput.RawButton.Y))
                 anchor.ChangeAnchorRoom();
 
-            // TODO automatically place anchors according to placed one
+            // Change anchor type
+            //if (OVRInput.GetDown(OVRInput.RawButton.A))
+            //    anchor.ChangeAnchorLocation(true);
+            //if (OVRInput.GetDown(OVRInput.RawButton.B))
+            //    anchor.ChangeAnchorLocation(false);
         }
 
         void GrabHoverObject(GameObject grbObj, Vector3 controllerPos, Quaternion controllerRot)
