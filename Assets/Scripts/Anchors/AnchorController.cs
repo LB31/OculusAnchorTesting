@@ -22,6 +22,7 @@ namespace SpatialAnchor
         private int currentAnchorLocationIndex;
         private int currentAnchorRoomIndex;
         private Vector3 lastPos;
+        private Quaternion lastRot;
 
         private Transform contentRoom;
 
@@ -41,6 +42,7 @@ namespace SpatialAnchor
 
             TextContentRoom.text = ContentRoom.ToString();
             TextTransform.text = transform.position.ToString();
+            TextTransform.text += "\n" + transform.rotation.eulerAngles.ToString();
 
             contentRoom = Binder.GetRoomObject(ContentRoom).transform;
             //if (GetComponent<OVRSpatialAnchor>())
@@ -49,10 +51,12 @@ namespace SpatialAnchor
 
         private void Update()
         {
-            if (transform.position != lastPos)
+            if (transform.position != lastPos || transform.rotation != lastRot)
             {
                 TextTransform.text = transform.position.ToString();
+                TextTransform.text += "\n" + transform.rotation.eulerAngles.ToString();
                 lastPos = transform.position;
+                lastRot = transform.rotation;
             }
         }
 
