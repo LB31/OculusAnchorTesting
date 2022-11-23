@@ -115,7 +115,7 @@ namespace SpatialAnchor
             AnchorData anchorData = GetAnchorFromDatabase(anchor);
             anchorCon.LocalPosition = anchorData.MarkerLocation;
             anchorCon.ContentRoom = anchorData.ContentRoom;
-            anchor.name += $"{anchorData.ContentRoom} {anchorCon.LocalPosition}";
+            anchor.name += $" {anchorData.ContentRoom} {anchorCon.LocalPosition}";
         }
 
         public void EraseAnchor(OVRSpatialAnchor _spatialAnchor)
