@@ -16,6 +16,7 @@ namespace SpatialAnchor
         public TMP_Text TextContentRoom;
         public TMP_Text TextTransform;
         public bool IsPlacementAnchor;
+        public List<GameObject> ObjectsToDeactivate = new();
         [HideInInspector]
         public AnchorObjectBinder Binder;
 
@@ -39,7 +40,11 @@ namespace SpatialAnchor
             anchorManager = FindObjectOfType<AnchorManager>();
             Binder = FindObjectOfType<AnchorObjectBinder>();
             if (!IsPlacementAnchor)
+            {
                 Binder.AllAnchors.Add(this);
+                DeactivateObjects();
+            }
+                
 
             TextContentRoom.text = ContentRoom.ToString();
             TextTransform.text = transform.position.ToString();
@@ -149,10 +154,12 @@ namespace SpatialAnchor
                     createdAnchors.Add(anchor);
 
 
-                    await Task.Delay(1000);
+                    await Task.Delay(200);
                     anchorManager.SaveAnchor(anchor, anchorcontrollerCopy.LocalPosition, ContentRoom);
                 }
             }
+            // After creating anchors
+            transform.position += Vector3.one * 0.1f;
         }
 
         private Vector2 GetAnchorAmountsForRoom(Transform room)
@@ -185,6 +192,12 @@ namespace SpatialAnchor
 
             TextContentRoom.text = current.ToString();
 
+        }
+
+        private void DeactivateObjects()
+        {
+            foreach (GameObject obj in ObjectsToDeactivate)
+                obj.SetActive(false);
         }
     }
 }
