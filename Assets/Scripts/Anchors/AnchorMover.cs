@@ -103,7 +103,7 @@ namespace SpatialAnchor
                 anchor.Save();
             // Erase Object
             if (OVRInput.GetDown(OVRInput.RawButton.X))
-                anchor.Erase();
+                anchor.EraseAll();
             // Change room type
             if (OVRInput.GetDown(OVRInput.RawButton.Y))
                 anchor.ChangeAnchorRoom();

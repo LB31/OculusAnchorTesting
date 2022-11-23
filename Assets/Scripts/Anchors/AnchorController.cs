@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using System.Linq;
 using static CustomEnums;
 
 namespace SpatialAnchor
@@ -24,7 +25,7 @@ namespace SpatialAnchor
         private Vector3 lastPos;
         private Quaternion lastRot;
 
-        private Transform contentRoom;
+        private Transform contentRoomObj;
 
         private float distanceBetweenAnchors = 3;
 
@@ -44,7 +45,7 @@ namespace SpatialAnchor
             TextTransform.text = transform.position.ToString();
             TextTransform.text += "\n" + transform.rotation.eulerAngles.ToString();
 
-            contentRoom = Binder.GetRoomObject(ContentRoom).transform;
+            contentRoomObj = Binder.GetRoomObject(ContentRoom).transform;
             //if (GetComponent<OVRSpatialAnchor>())
             //    BindRelationObject();
         }
@@ -67,11 +68,27 @@ namespace SpatialAnchor
 
         [ContextMenu("Erase")]
         public void Erase()
-        {          
+        {
             Binder.AllAnchors.Remove(this);
-            Binder.UnbindRoom(contentRoom);
+            Binder.UnbindRoom(contentRoomObj);
 
             anchorManager.EraseAnchor(GetComponent<OVRSpatialAnchor>());
+        }
+
+        [ContextMenu("EraseAll")]
+        public void EraseAll()
+        {
+            // Find all anchors und filter to current ContentRoom
+            List<OVRSpatialAnchor> allAnchors = FindObjectsOfType<OVRSpatialAnchor>().ToList();
+            allAnchors = allAnchors.Where(a => a.GetComponent<AnchorController>().ContentRoom.Equals(ContentRoom)).ToList();
+
+            foreach (OVRSpatialAnchor anchor in allAnchors)
+            {
+                Binder.AllAnchors.Remove(anchor.GetComponent<AnchorController>());
+                anchorManager.EraseAnchor(anchor);
+            }
+            
+            Binder.UnbindRoom(contentRoomObj);
         }
 
         [ContextMenu("Save")]
@@ -79,14 +96,16 @@ namespace SpatialAnchor
         {
             Transform startParent = null;
             Transform copy = null;
+            List<OVRSpatialAnchor> createdAnchors = new();
 
-            Vector2 anchorAmounts = GetAnchorAmounts(contentRoom);
+            Vector2 anchorAmounts = GetAnchorAmountsForRoom(contentRoomObj);
 
             bool firstAnchor = true;
 
             float x;
             float z;
 
+            // Create spatial anchors according to selected room
             for (int i = 0; i <= anchorAmounts.x; i++)
             {
                 for (int j = 0; j <= anchorAmounts.y; j++)
@@ -119,20 +138,24 @@ namespace SpatialAnchor
                         x = z = 0;
                     }
 
-                    AnchorController acCopy = copy.GetComponent<AnchorController>();
-                    acCopy.IsPlacementAnchor = false;
-                    acCopy.LocalPosition = new Vector2(x, z);
-                    acCopy.TryInitialize();
+                    AnchorController anchorcontrollerCopy = copy.GetComponent<AnchorController>();
+                    anchorcontrollerCopy.IsPlacementAnchor = false;
+                    anchorcontrollerCopy.LocalPosition = new Vector2(x, z);
+
+                    anchorcontrollerCopy.TryInitialize();
                     Binder.TryInitialize();
 
                     OVRSpatialAnchor anchor = copy.gameObject.AddComponent<OVRSpatialAnchor>();
+                    createdAnchors.Add(anchor);
+
+
                     await Task.Delay(1000);
-                    anchorManager.SaveAnchor(anchor, acCopy.LocalPosition, ContentRoom);
+                    anchorManager.SaveAnchor(anchor, anchorcontrollerCopy.LocalPosition, ContentRoom);
                 }
             }
         }
 
-        private Vector2 GetAnchorAmounts(Transform room)
+        private Vector2 GetAnchorAmountsForRoom(Transform room)
         {
             float width = room.lossyScale.x;
             float length = room.lossyScale.z;
@@ -158,7 +181,7 @@ namespace SpatialAnchor
             ContentRoom = current;
             GameObject newRoom = Binder.GetRoomObject(ContentRoom);
             if (newRoom)
-                contentRoom = newRoom.transform;
+                contentRoomObj = newRoom.transform;
 
             TextContentRoom.text = current.ToString();
 
